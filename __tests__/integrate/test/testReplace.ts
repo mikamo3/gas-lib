@@ -37,7 +37,27 @@ export const testReplace = () => {
         .getSheetByName("hogehoge")
         .getDataRange()
         .getValues();
-      assert("データが返却されること").toEqual(actual, [
+      assert("データが設定されること").toEqual(actual, [
+        ["hoge", ""],
+        ["hoge", "fuga"],
+        ["piyo", ""]
+      ]);
+    }
+  );
+  test(
+    "開始位置が指定された場合",
+    () => {
+      const spreadsheet = SpreadsheetApp.openById(testSpreadSheetId);
+      setTestdata(spreadsheet, "hogehoge", [["foo", "bar"]]);
+    },
+    () => {
+      spreadsheet.replace("hogehoge", [["hoge"], ["hoge", "fuga"], ["piyo"]], 1);
+      const actual = SpreadsheetApp.openById(testSpreadSheetId)
+        .getSheetByName("hogehoge")
+        .getDataRange()
+        .getValues();
+      assert("データが設定されること").toEqual(actual, [
+        ["foo", "bar"],
         ["hoge", ""],
         ["hoge", "fuga"],
         ["piyo", ""]

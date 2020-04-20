@@ -29,7 +29,23 @@ exports.testReplace = function () {
             .getSheetByName("hogehoge")
             .getDataRange()
             .getValues();
-        common_1.assert("データが返却されること").toEqual(actual, [
+        common_1.assert("データが設定されること").toEqual(actual, [
+            ["hoge", ""],
+            ["hoge", "fuga"],
+            ["piyo", ""]
+        ]);
+    });
+    common_1.test("開始位置が指定された場合", function () {
+        var spreadsheet = SpreadsheetApp.openById(testSpreadSheetId);
+        spreadsheet_1.setTestdata(spreadsheet, "hogehoge", [["foo", "bar"]]);
+    }, function () {
+        spreadsheet.replace("hogehoge", [["hoge"], ["hoge", "fuga"], ["piyo"]], 1);
+        var actual = SpreadsheetApp.openById(testSpreadSheetId)
+            .getSheetByName("hogehoge")
+            .getDataRange()
+            .getValues();
+        common_1.assert("データが設定されること").toEqual(actual, [
+            ["foo", "bar"],
             ["hoge", ""],
             ["hoge", "fuga"],
             ["piyo", ""]

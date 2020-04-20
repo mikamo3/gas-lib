@@ -26,14 +26,16 @@ export class Spreadsheet {
     }
     return values;
   }
-  replace(sheetname: string, values: unknown[][]) {
+  replace(sheetname: string, values: unknown[][], after = 0) {
     let sheet: GoogleAppsScript.Spreadsheet.Sheet;
     try {
       sheet = this.spreadSheet.getSheetByName(sheetname);
     } catch (e) {
       throw new SpreadsheetException(e);
     }
-    sheet.clear();
+    if (sheet.getLastRow() !== 0 && sheet.getLastRow() > after) {
+      sheet.deleteRows(after + 1, sheet.getLastRow() - after);
+    }
     if (!values || values.length === 0) {
       return;
     }
@@ -47,6 +49,11 @@ export class Spreadsheet {
       }
       return filled;
     });
-    sheet.getRange(1, 1, values.length, maxColumn).setValues(formattedValues);
+    if (after === 0) {
+      sheet.insertRows(formattedValues.length);
+    } else {
+      sheet.insertRowsAfter(after, formattedValues.length);
+    }
+    sheet.getRange(after + 1, 1, values.length, maxColumn).setValues(formattedValues);
   }
 }

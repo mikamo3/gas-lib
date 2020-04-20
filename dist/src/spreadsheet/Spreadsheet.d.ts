@@ -3,5 +3,5 @@ export declare class Spreadsheet {
     private constructor();
     static openById(id: string): Spreadsheet;
     getAllValues(sheetname: string): any[][];
-    replace(sheetname: string, values: unknown[][]): void;
+    replace(sheetname: string, values: unknown[][], after?: number): void;
 }

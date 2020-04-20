@@ -28,7 +28,8 @@ var Spreadsheet = /** @class */ (function () {
         }
         return values;
     };
-    Spreadsheet.prototype.replace = function (sheetname, values) {
+    Spreadsheet.prototype.replace = function (sheetname, values, after) {
+        if (after === void 0) { after = 0; }
         var sheet;
         try {
             sheet = this.spreadSheet.getSheetByName(sheetname);
@@ -36,7 +37,9 @@ var Spreadsheet = /** @class */ (function () {
         catch (e) {
             throw new errors_1.SpreadsheetException(e);
         }
-        sheet.clear();
+        if (sheet.getLastRow() !== 0 && sheet.getLastRow() > after) {
+            sheet.deleteRows(after + 1, sheet.getLastRow() - after);
+        }
         if (!values || values.length === 0) {
             return;
         }
@@ -50,7 +53,13 @@ var Spreadsheet = /** @class */ (function () {
             }
             return filled;
         });
-        sheet.getRange(1, 1, values.length, maxColumn).setValues(formattedValues);
+        if (after === 0) {
+            sheet.insertRows(formattedValues.length);
+        }
+        else {
+            sheet.insertRowsAfter(after, formattedValues.length);
+        }
+        sheet.getRange(after + 1, 1, values.length, maxColumn).setValues(formattedValues);
     };
     return Spreadsheet;
 }());

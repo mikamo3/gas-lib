@@ -9,14 +9,20 @@ var getDataRange = jest.fn();
 var getRange = jest.fn();
 var getValues = jest.fn();
 var setValues = jest.fn();
-var clear = jest.fn();
+var deleteRows = jest.fn();
+var getLastRow = jest.fn();
+var insertRowsAfter = jest.fn();
+var insertRows = jest.fn();
 var mockedSpreadSheet = {
     getSheetByName: getSheetByName
 };
 var mockedSheet = {
-    clear: clear,
     getRange: getRange,
-    getDataRange: getDataRange
+    getDataRange: getDataRange,
+    deleteRows: deleteRows,
+    getLastRow: getLastRow,
+    insertRowsAfter: insertRowsAfter,
+    insertRows: insertRows
 };
 var mockedRange = {
     getValues: getValues,
@@ -24,8 +30,11 @@ var mockedRange = {
 };
 var getValuesRVB = [[]];
 var getValuesRV;
+var getLastRowRVB = 0;
+var getLastRowRV;
 SpreadsheetApp.openById = openById;
 beforeAll(function () {
+    getLastRowRV = getLastRowRVB;
     getValuesRV = getValuesRVB;
 });
 beforeEach(function () {
@@ -34,6 +43,7 @@ beforeEach(function () {
     getDataRange.mockReturnValue(mockedRange);
     getRange.mockReturnValue(mockedRange);
     getValues.mockReturnValue(getValuesRV);
+    getLastRow.mockReturnValue(getLastRowRV);
 });
 afterEach(function () {
     jest.resetAllMocks();
@@ -133,12 +143,10 @@ describe("Spreadsheet", function () {
     });
     describe("replace", function () {
         var values;
+        var after = 1;
         beforeEach(function () {
             var spreadSheet = Spreadsheet_1.Spreadsheet.openById("hogehoge");
-            spreadSheet.replace("sheet", values);
-        });
-        it("Sheet.clearが呼ばれること", function () {
-            expect(clear).toBeCalled();
+            spreadSheet.replace("sheet", values, after);
         });
         describe("undefinedが渡された場合", function () {
             beforeAll(function () {
@@ -148,31 +156,101 @@ describe("Spreadsheet", function () {
                 expect(getRange).not.toBeCalled();
             });
         });
-        describe("空配列が渡された場合", function () {
+        describe("afterに0が指定されている場合", function () {
             beforeAll(function () {
-                values = [];
+                after = 0;
             });
-            it("Sheet.getRangeが呼び出されないこと", function () {
-                expect(getRange).not.toBeCalled();
+            describe("シートにデータが存在しない場合", function () {
+                beforeAll(function () {
+                    getLastRowRV = 0;
+                });
+                it("Sheet.deleteRowsが呼ばれないこと", function () {
+                    expect(deleteRows).not.toBeCalled();
+                });
+            });
+            describe("シートにデータが存在する場合", function () {
+                beforeAll(function () {
+                    getLastRowRV = 5;
+                });
+                it("Sheet.deleteRowsが呼ばれること", function () {
+                    expect(deleteRows).toBeCalledWith(1, 5);
+                });
+            });
+            describe("空配列が渡された場合", function () {
+                beforeAll(function () {
+                    values = [];
+                });
+                it("Sheet.setValuesが呼び出されないこと", function () {
+                    expect(setValues).not.toBeCalled();
+                });
+            });
+            describe("値の存在する配列が渡された場合", function () {
+                beforeAll(function () {
+                    values = [
+                        ["foo", "bar"],
+                        ["bar", "baz"],
+                        ["hoge", "fuga", "piyo", "hoge"]
+                    ];
+                });
+                it("Sheet.insertRowsが呼び出されること", function () {
+                    expect(insertRows).toBeCalledWith(3);
+                });
+                it("Sheet.getRangeがセル左上、配列長の行数、配列要素の最大長の列数が指定されること", function () {
+                    expect(getRange).toBeCalledWith(1, 1, 3, 4);
+                });
+                it("Range.setValuesが引数で渡されたvaluesの要素の配列長が最大長に満たない場合空文字で埋められた値で呼び出されること", function () {
+                    expect(setValues).toBeCalledWith([
+                        ["foo", "bar", "", ""],
+                        ["bar", "baz", "", ""],
+                        ["hoge", "fuga", "piyo", "hoge"]
+                    ]);
+                });
             });
         });
-        describe("値の存在する配列が渡された場合", function () {
+        describe("afterに3が指定されている場合", function () {
             beforeAll(function () {
-                values = [
-                    ["foo", "bar"],
-                    ["bar", "baz"],
-                    ["hoge", "fuga", "piyo", "hoge"]
-                ];
+                after = 3;
             });
-            it("Sheet.getRangeがセル左上、配列長の行数、配列要素の最大長の列数が指定されること", function () {
-                expect(getRange).toBeCalledWith(1, 1, 3, 4);
+            describe("シートにデータが存在しない場合", function () {
+                beforeAll(function () {
+                    getLastRowRV = 0;
+                });
+                it("Sheet.deleteRowsが呼ばれないこと", function () {
+                    expect(deleteRows).not.toBeCalled();
+                });
             });
-            it("Range.setValuesが引数で渡されたvaluesの要素の配列長が最大長に満たない場合空文字で埋められた値で呼び出されること", function () {
-                expect(setValues).toBeCalledWith([
-                    ["foo", "bar", "", ""],
-                    ["bar", "baz", "", ""],
-                    ["hoge", "fuga", "piyo", "hoge"]
-                ]);
+            describe("シートにデータが存在する場合", function () {
+                describe("開始位置より後にシートにデータが存在しない場合", function () {
+                    beforeAll(function () {
+                        getLastRowRV = 3;
+                    });
+                    it("deleteRowsが呼び出されないこと", function () {
+                        expect(deleteRows).not.toBeCalled();
+                    });
+                });
+                describe("開始位置より後にシートにデータが存在する場合", function () {
+                    beforeAll(function () {
+                        getLastRowRV = 4;
+                    });
+                    it("Sheet.deleteRowsが呼ばれること", function () {
+                        expect(deleteRows).toBeCalledWith(4, 1);
+                    });
+                });
+            });
+            describe("値の存在する配列が渡された場合", function () {
+                beforeAll(function () {
+                    values = [
+                        ["foo", "bar"],
+                        ["bar", "baz"],
+                        ["hoge", "fuga", "piyo", "hoge"]
+                    ];
+                });
+                it("Sheet.insertRowsAfterが呼び出されること", function () {
+                    expect(insertRowsAfter).toBeCalledWith(3, 3);
+                });
+                it("Sheet.getRangeがafterの値、配列長の行数、配列要素の最大長の列数が指定されること", function () {
+                    expect(getRange).toBeCalledWith(4, 1, 3, 4);
+                });
             });
         });
     });
