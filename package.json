@@ -1,0 +1,83 @@
+{
+  "name": "gas-lib",
+  "version": "1.0.0",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "repository": "https://github.com/mikamo3/gas-lib",
+  "author": "mikamo3 <kamo3proj@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "lint": "eslint --fix src/**/*.ts",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cover": "jest --coverage",
+    "build": "tsc",
+    "clean:dist": "rimraf dist",
+    "build:test": "webpack --config webpack.config.test.js",
+    "push": "yarn run build:test && clasp push"
+  },
+  "devDependencies": {
+    "@google/clasp": "^2.3.0",
+    "@types/google-apps-script": "1.0.12",
+    "@types/jest": "25.2.1",
+    "@typescript-eslint/eslint-plugin": "2.27.0",
+    "@typescript-eslint/parser": "2.27.0",
+    "clean-webpack-plugin": "^3.0.0",
+    "copy-webpack-plugin": "^5.1.1",
+    "cpx": "1.5.0",
+    "eslint": "6.8.0",
+    "eslint-config-prettier": "6.10.1",
+    "eslint-import-resolver-webpack": "^0.12.1",
+    "eslint-plugin-prettier": "3.1.2",
+    "gas-webpack-plugin": "1.0.2",
+    "husky": "^4.2.5",
+    "jest": "25.3.0",
+    "prettier": "2.0.4",
+    "rimraf": "3.0.2",
+    "ts-jest": "^25.4.0",
+    "ts-loader": "6.2.2",
+    "typescript": "3.8.3",
+    "webpack": "4.42.1",
+    "webpack-cli": "3.3.11"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "((src|__tests__)/.+(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "<rootDir>/__tests__/integrate",
+      "<rootDir>/dist"
+    ],
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ],
+    "moduleNameMapper": {
+      "src/(.*)$": "<rootDir>/src/$1",
+      "mocks/(.*)$": "<rootDir>/__mocks__/$1",
+      "testhelper/(.*)$": "<rootDir>/__testhelper__/$1"
+    },
+    "modulePathIgnorePatterns": [
+      "<rootDir>/dist"
+    ],
+    "globals": {
+      "SpreadsheetApp": {}
+    }
+  },
+  "dependencies": {
+    "@types/underscore": "^1.9.4",
+    "underscore": "^1.10.2"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn run clean:dist && yarn run build && git add dist"
+    }
+  }
+}

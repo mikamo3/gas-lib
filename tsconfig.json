@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "sourceMap": true,
+    "target": "es5",
+    "module": "commonjs",
+    "declaration": true,
+    "esModuleInterop": true,
+    "baseUrl": "./",
+    "paths": {
+      "src/*": ["src/*"],
+      "mocks/*": ["__mocks__/*"],
+      "testhelper/*": ["__testhelper__/*"]
+    },
+    "moduleResolution": "Node",
+    "skipLibCheck": true,
+    "outDir": "dist"
+  }
+}

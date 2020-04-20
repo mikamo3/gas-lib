@@ -1,0 +1,25 @@
+{
+  "name": "gas-lib",
+  "dockerFile": "Dockerfile",
+  "extensions": ["esbenp.prettier-vscode", "dbaeumer.vscode-eslint"],
+  "settings": {
+    "terminal.integrated.shell.linux": "/bin/bash",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true
+    },
+    "[typescript]": {
+      "editor.formatOnSave": false,
+      "editor.tabSize": 2
+    }
+  },
+  "remoteUser": "dev",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
+  "workspaceFolder": "/workspace",
+  "mounts": [
+    "source=gas-lib-node_modules,target=/workspace/node_modules,type=volume",
+    "source=${env:HOME}${env:USERPROFILE}/.ssh,target=/home/dev/.ssh,type=bind,consistency=cached",
+    "source=${env:HOME}${env:USERPROFILE}/.gitconfig,target=/home/dev/.gitconfig,type=bind,consistency=cached",
+    "source=${env:HOME}${env:USERPROFILE}/.clasprc.json,target=/home/dev/.clasprc.json,type=bind,consistency=cached"
+  ],
+  "postCreateCommand": "sudo chown dev /workspace/node_modules"
+}
