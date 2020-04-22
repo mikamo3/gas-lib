@@ -13,6 +13,10 @@ var deleteRows = jest.fn();
 var getLastRow = jest.fn();
 var insertRowsAfter = jest.fn();
 var insertRows = jest.fn();
+var newDataValidation = jest.fn();
+var requireValueInList = jest.fn();
+var build = jest.fn();
+var setDataValidation = jest.fn();
 var mockedSpreadSheet = {
     getSheetByName: getSheetByName
 };
@@ -26,16 +30,21 @@ var mockedSheet = {
 };
 var mockedRange = {
     getValues: getValues,
-    setValues: setValues
+    setValues: setValues,
+    setDataValidation: setDataValidation
 };
 var getValuesRVB = [[]];
 var getValuesRV;
 var getLastRowRVB = 0;
 var getLastRowRV;
+var buildRVB = [];
+var buildRV;
 SpreadsheetApp.openById = openById;
+SpreadsheetApp.newDataValidation = newDataValidation;
 beforeAll(function () {
     getLastRowRV = getLastRowRVB;
     getValuesRV = getValuesRVB;
+    buildRV = buildRVB;
 });
 beforeEach(function () {
     openById.mockReturnValue(mockedSpreadSheet);
@@ -44,6 +53,9 @@ beforeEach(function () {
     getRange.mockReturnValue(mockedRange);
     getValues.mockReturnValue(getValuesRV);
     getLastRow.mockReturnValue(getLastRowRV);
+    newDataValidation.mockReturnValue({ requireValueInList: requireValueInList });
+    requireValueInList.mockReturnValue({ build: build });
+    build.mockReturnValue(buildRV);
 });
 afterEach(function () {
     jest.resetAllMocks();
@@ -252,6 +264,39 @@ describe("Spreadsheet", function () {
                     expect(getRange).toBeCalledWith(4, 1, 3, 4);
                 });
             });
+        });
+    });
+    describe("setSelectbox", function () {
+        var row, column, numRows, numColumns, values;
+        beforeAll(function () {
+            row = 1;
+            column = 2;
+            numRows = 3;
+            numColumns = 4;
+            values = ["0", "0.5", "1"];
+            buildRV = values;
+        });
+        beforeEach(function () {
+            var spreadSheet = Spreadsheet_1.Spreadsheet.openById("hogehoge");
+            spreadSheet.setSelectbox("hoge", values, row, column, numRows, numColumns);
+        });
+        it("newDataValidationが呼び出されること", function () {
+            expect(SpreadsheetApp.newDataValidation).toBeCalled();
+        });
+        it("requireValueInListが呼び出されること", function () {
+            expect(requireValueInList).toBeCalledWith(["0", "0.5", "1"]);
+        });
+        it("buildが呼び出されること", function () {
+            expect(build).toBeCalled();
+        });
+        it("getSheetByNameが呼び出されること", function () {
+            expect(getSheetByName).toBeCalledWith("hoge");
+        });
+        it("getRangeが呼び出されること", function () {
+            expect(getRange).toBeCalledWith(1, 2, 3, 4);
+        });
+        it("setDataValidationが呼び出されること", function () {
+            expect(setDataValidation).toBeCalledWith(["0", "0.5", "1"]);
         });
     });
 });

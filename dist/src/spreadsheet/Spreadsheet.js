@@ -61,6 +61,15 @@ var Spreadsheet = /** @class */ (function () {
         }
         sheet.getRange(after + 1, 1, values.length, maxColumn).setValues(formattedValues);
     };
+    Spreadsheet.prototype.setSelectbox = function (sheetname, values, row, column, numRows, numColumns) {
+        if (numRows === void 0) { numRows = 1; }
+        if (numColumns === void 0) { numColumns = 1; }
+        var rule = SpreadsheetApp.newDataValidation().requireValueInList(values).build();
+        this.spreadSheet
+            .getSheetByName(sheetname)
+            .getRange(row, column, numRows, numColumns)
+            .setDataValidation(rule);
+    };
     return Spreadsheet;
 }());
 exports.Spreadsheet = Spreadsheet;

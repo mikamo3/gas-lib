@@ -56,4 +56,18 @@ export class Spreadsheet {
     }
     sheet.getRange(after + 1, 1, values.length, maxColumn).setValues(formattedValues);
   }
+  setSelectbox(
+    sheetname: string,
+    values: string[],
+    row: number,
+    column: number,
+    numRows = 1,
+    numColumns = 1
+  ) {
+    const rule = SpreadsheetApp.newDataValidation().requireValueInList(values).build();
+    this.spreadSheet
+      .getSheetByName(sheetname)
+      .getRange(row, column, numRows, numColumns)
+      .setDataValidation(rule);
+  }
 }

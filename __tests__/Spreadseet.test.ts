@@ -12,10 +12,18 @@ const deleteRows = jest.fn();
 const getLastRow = jest.fn();
 const insertRowsAfter = jest.fn();
 const insertRows = jest.fn();
-const mockedSpreadSheet: Partial<{ [s in keyof GoogleAppsScript.Spreadsheet.Spreadsheet]: any }> = {
+const newDataValidation = jest.fn();
+const requireValueInList = jest.fn();
+const build = jest.fn();
+const setDataValidation = jest.fn();
+
+const mockedSpreadSheet: Partial<
+  { [s in keyof GoogleAppsScript.Spreadsheet.Spreadsheet]: unknown }
+> = {
   getSheetByName
 };
-const mockedSheet: Partial<{ [s in keyof GoogleAppsScript.Spreadsheet.Sheet]: any }> = {
+
+const mockedSheet: Partial<{ [s in keyof GoogleAppsScript.Spreadsheet.Sheet]: unknown }> = {
   getRange,
   getDataRange,
   deleteRows,
@@ -23,19 +31,24 @@ const mockedSheet: Partial<{ [s in keyof GoogleAppsScript.Spreadsheet.Sheet]: an
   insertRowsAfter,
   insertRows
 };
-const mockedRange: Partial<{ [s in keyof GoogleAppsScript.Spreadsheet.Range]: any }> = {
+const mockedRange: Partial<{ [s in keyof GoogleAppsScript.Spreadsheet.Range]: unknown }> = {
   getValues,
-  setValues
+  setValues,
+  setDataValidation
 };
 const getValuesRVB = [[]];
 let getValuesRV: unknown[][];
 const getLastRowRVB = 0;
 let getLastRowRV: number;
+const buildRVB = [];
+let buildRV: unknown[];
 SpreadsheetApp.openById = openById;
+SpreadsheetApp.newDataValidation = newDataValidation;
 
 beforeAll(() => {
   getLastRowRV = getLastRowRVB;
   getValuesRV = getValuesRVB;
+  buildRV = buildRVB;
 });
 beforeEach(() => {
   openById.mockReturnValue(mockedSpreadSheet);
@@ -44,6 +57,9 @@ beforeEach(() => {
   getRange.mockReturnValue(mockedRange);
   getValues.mockReturnValue(getValuesRV);
   getLastRow.mockReturnValue(getLastRowRV);
+  newDataValidation.mockReturnValue({ requireValueInList });
+  requireValueInList.mockReturnValue({ build });
+  build.mockReturnValue(buildRV);
 });
 
 afterEach(() => {
@@ -254,6 +270,39 @@ describe("Spreadsheet", () => {
           expect(getRange).toBeCalledWith(4, 1, 3, 4);
         });
       });
+    });
+  });
+  describe("setSelectbox", () => {
+    let row: number, column: number, numRows: number, numColumns: number, values: string[];
+    beforeAll(() => {
+      row = 1;
+      column = 2;
+      numRows = 3;
+      numColumns = 4;
+      values = ["0", "0.5", "1"];
+      buildRV = values;
+    });
+    beforeEach(() => {
+      const spreadSheet = Spreadsheet.openById("hogehoge");
+      spreadSheet.setSelectbox("hoge", values, row, column, numRows, numColumns);
+    });
+    it("newDataValidationが呼び出されること", () => {
+      expect(SpreadsheetApp.newDataValidation).toBeCalled();
+    });
+    it("requireValueInListが呼び出されること", () => {
+      expect(requireValueInList).toBeCalledWith(["0", "0.5", "1"]);
+    });
+    it("buildが呼び出されること", () => {
+      expect(build).toBeCalled();
+    });
+    it("getSheetByNameが呼び出されること", () => {
+      expect(getSheetByName).toBeCalledWith("hoge");
+    });
+    it("getRangeが呼び出されること", () => {
+      expect(getRange).toBeCalledWith(1, 2, 3, 4);
+    });
+    it("setDataValidationが呼び出されること", () => {
+      expect(setDataValidation).toBeCalledWith(["0", "0.5", "1"]);
     });
   });
 });

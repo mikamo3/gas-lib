@@ -4,6 +4,7 @@ var spreadsheet_1 = require("./spreadsheet");
 var testOpenById_1 = require("./test/testOpenById");
 var testGetAllValues_1 = require("./test/testGetAllValues");
 var testReplace_1 = require("./test/testReplace");
+var testSetSelectbox_1 = require("./test/testSetSelectbox");
 global.prepare = function () {
     var testFolderId = "1FdYqQOenb_Rn9jN6HvvAo1OjbxXHRmj4";
     var spreadSheetName = "Suppli_テスト";
@@ -22,5 +23,6 @@ global.runTest = function () {
     testOpenById_1.testOpenById();
     testGetAllValues_1.testGetAllValues();
     testReplace_1.testReplace();
+    testSetSelectbox_1.testSetSelectbox();
 };
 //# sourceMappingURL=index.js.map
