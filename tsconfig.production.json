@@ -13,5 +13,5 @@
     "skipLibCheck": true,
     "outDir": "dist"
   },
-  "exclude": ["__tests__", "dist"]
+  "exclude": ["__tests__", "dist", "dist_test"]
 }

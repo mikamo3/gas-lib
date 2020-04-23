@@ -1,7 +1,7 @@
 {
   "name": "gas-lib",
   "version": "1.0.0",
-  "main": "distindex.js",
+  "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": "https://github.com/mikamo3/gas-lib",
   "author": "mikamo3 <kamo3proj@gmail.com>",
