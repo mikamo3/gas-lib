@@ -12,5 +12,6 @@
     "moduleResolution": "Node",
     "skipLibCheck": true,
     "outDir": "dist"
-  }
+  },
+  "exclude": ["__tests__"]
 }
