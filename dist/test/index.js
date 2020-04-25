@@ -5,4 +5,5 @@ function __export(m) {
 Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./assert"));
 __export(require("./testRunner"));
+__export(require("./spreadsheet"));
 //# sourceMappingURL=index.js.map
