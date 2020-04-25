@@ -1,6 +1,6 @@
 type SheetValues = Array<Array<string | number>>;
 
-export const deleteSpreadSheet = (testSpreadSheetId: string) => {
+const deleteSpreadSheet = (testSpreadSheetId: string) => {
   try {
     const folder = DriveApp.getFileById(testSpreadSheetId);
     folder.setTrashed(true);
@@ -11,7 +11,7 @@ export const deleteSpreadSheet = (testSpreadSheetId: string) => {
   Logger.log(`delete spreadSheet for test. id:${testSpreadSheetId}`);
 };
 
-export const createSpreadSheet = (spreadSheetName: string, folderId: string) => {
+const createSpreadSheet = (spreadSheetName: string, folderId: string) => {
   const file = Drive.Files.insert({
     title: spreadSheetName,
     mimeType: "application/vnd.google-apps.spreadsheet",
@@ -21,7 +21,7 @@ export const createSpreadSheet = (spreadSheetName: string, folderId: string) => 
   return file.id;
 };
 
-export const setTestdata = (
+const setTestdata = (
   spreadSheet: GoogleAppsScript.Spreadsheet.Spreadsheet,
   sheetName: string,
   values: SheetValues
@@ -65,4 +65,9 @@ export const setTestdata = (
   };
   prepareSheet(spreadSheet, sheetName);
   appendValues(spreadSheet, sheetName, values);
+};
+export const TestSpreadsheetHelper = {
+  setTestdata,
+  deleteSpreadSheet,
+  createSpreadSheet
 };

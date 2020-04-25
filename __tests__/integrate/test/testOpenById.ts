@@ -1,5 +1,4 @@
-import { Spreadsheet } from "src/index";
-import { test } from "./common";
+import { Spreadsheet, Test } from "src/index";
 export const testOpenById = () => {
   const testSpreadSheetId = PropertiesService.getScriptProperties().getProperty(
     "testSpreadSheetId"
@@ -7,7 +6,7 @@ export const testOpenById = () => {
   if (!testSpreadSheetId) {
     throw new Error("spreadSheet does not exist");
   }
-  test(
+  Test.run(
     "openById",
     () => {
       //do nothing

@@ -1,4 +1,4 @@
-import { isMatch, isEqual } from "underscore";
+import { isEqual, isMatch } from "underscore";
 
 export class AssertionError extends Error {
   constructor(actual: unknown, expected: unknown) {
@@ -6,6 +6,7 @@ export class AssertionError extends Error {
     Logger.log({ actual, expected });
   }
 }
+
 export const assert = (message: string) => {
   const logAssertMessage = (m: string) => {
     const msg = m;
@@ -31,20 +32,4 @@ export const assert = (message: string) => {
       log();
     }
   };
-};
-
-export const test = (message: string, beforeRun: Function, test: Function, afterRun?: Function) => {
-  Logger.log(message);
-  try {
-    beforeRun();
-    test();
-  } catch (e) {
-    Logger.log("fail");
-    throw e;
-  } finally {
-    if (afterRun) {
-      afterRun();
-    }
-  }
-  Logger.log("pass");
 };

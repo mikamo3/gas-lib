@@ -1,6 +1,4 @@
-import { Spreadsheet } from "src/index";
-import { test, assert } from "./common";
-import { setTestdata } from "../spreadsheet";
+import { Spreadsheet, Test, TestSpreadsheetHelper, assert } from "src/index";
 
 export const testSetSelectbox = () => {
   const testSpreadSheetId = PropertiesService.getScriptProperties().getProperty(
@@ -10,11 +8,11 @@ export const testSetSelectbox = () => {
     throw new Error("spreadSheet does not exist");
   }
   const spreadsheet = Spreadsheet.openById(testSpreadSheetId);
-  test(
+  Test.run(
     "チェックボックスを設定",
     () => {
       const spreadsheet = SpreadsheetApp.openById(testSpreadSheetId);
-      setTestdata(spreadsheet, "hogehoge", []);
+      TestSpreadsheetHelper.setTestdata(spreadsheet, "hogehoge", []);
     },
     () => {
       spreadsheet.setSelectbox("hogehoge", ["foo", "bar"], 1, 2, 3, 4);

@@ -1,6 +1,4 @@
-import { Spreadsheet } from "src/index";
-import { test, assert } from "./common";
-import { setTestdata } from "../spreadsheet";
+import { Spreadsheet, Test, TestSpreadsheetHelper, assert } from "src/index";
 
 export const testReplace = () => {
   const testSpreadSheetId = PropertiesService.getScriptProperties().getProperty(
@@ -10,11 +8,11 @@ export const testReplace = () => {
     throw new Error("spreadSheet does not exist");
   }
   const spreadsheet = Spreadsheet.openById(testSpreadSheetId);
-  test(
+  Test.run(
     "データがない場合",
     () => {
       const spreadsheet = SpreadsheetApp.openById(testSpreadSheetId);
-      setTestdata(spreadsheet, "hogehoge", [["foo", "bar"]]);
+      TestSpreadsheetHelper.setTestdata(spreadsheet, "hogehoge", [["foo", "bar"]]);
     },
     () => {
       spreadsheet.replace("hogehoge", []);
@@ -25,11 +23,11 @@ export const testReplace = () => {
       assert("シートにデータが存在しないこと").toEqual(actual, [[""]]);
     }
   );
-  test(
+  Test.run(
     "シートにデータがある場合",
     () => {
       const spreadsheet = SpreadsheetApp.openById(testSpreadSheetId);
-      setTestdata(spreadsheet, "hogehoge", [["foo", "bar"]]);
+      TestSpreadsheetHelper.setTestdata(spreadsheet, "hogehoge", [["foo", "bar"]]);
     },
     () => {
       spreadsheet.replace("hogehoge", [["hoge"], ["hoge", "fuga"], ["piyo"]]);
@@ -44,11 +42,11 @@ export const testReplace = () => {
       ]);
     }
   );
-  test(
+  Test.run(
     "開始位置が指定された場合",
     () => {
       const spreadsheet = SpreadsheetApp.openById(testSpreadSheetId);
-      setTestdata(spreadsheet, "hogehoge", [["foo", "bar"]]);
+      TestSpreadsheetHelper.setTestdata(spreadsheet, "hogehoge", [["foo", "bar"]]);
     },
     () => {
       spreadsheet.replace("hogehoge", [["hoge"], ["hoge", "fuga"], ["piyo"]], 1);

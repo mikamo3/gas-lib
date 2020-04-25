@@ -23,8 +23,6 @@ module.exports = {
     extensions: [".ts"],
     alias: {
       src: path.resolve(__dirname, "./src"),
-      mocks: path.resolve(__dirname, "./__mocks__"),
-      testhelper: path.resolve(__dirname, "./__testhelper__"),
     },
   },
   plugins: [
