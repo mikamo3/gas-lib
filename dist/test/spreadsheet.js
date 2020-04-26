@@ -53,9 +53,16 @@ var setTestdata = function (spreadSheet, sheetName, values) {
     prepareSheet(spreadSheet, sheetName);
     appendValues(spreadSheet, sheetName, values);
 };
+var deleteSheet = function (spreadSheet, sheetname) {
+    var sheet = spreadSheet.getSheetByName(sheetname);
+    if (sheet) {
+        spreadSheet.deleteSheet(sheet);
+    }
+};
 exports.TestSpreadsheetHelper = {
     setTestdata: setTestdata,
     deleteSpreadSheet: deleteSpreadSheet,
-    createSpreadSheet: createSpreadSheet
+    createSpreadSheet: createSpreadSheet,
+    deleteSheet: deleteSheet
 };
 //# sourceMappingURL=spreadsheet.js.map

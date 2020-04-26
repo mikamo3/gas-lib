@@ -3,6 +3,7 @@ import { testGetAllValues } from "./test/testGetAllValues";
 import { testReplace } from "./test/testReplace";
 import { testSetSelectbox } from "./test/testSetSelectbox";
 import { TestSpreadsheetHelper } from "src/index";
+import { testInsertSheet } from "./test/testInsertSheet";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let global: any;
 const prepareSpreadsheet = () => {
@@ -27,4 +28,10 @@ global.runTest = () => {
   testGetAllValues();
   testReplace();
   testSetSelectbox();
+  testInsertSheet();
 };
+global.testOpenById = testOpenById;
+global.testGetAllValues = testGetAllValues;
+global.testReplace = testReplace;
+global.testSetSelectbox = testSetSelectbox;
+global.testInsertSheet = testInsertSheet;

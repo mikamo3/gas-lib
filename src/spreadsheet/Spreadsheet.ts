@@ -70,4 +70,14 @@ export class Spreadsheet {
       .getRange(row, column, numRows, numColumns)
       .setDataValidation(rule);
   }
+  insertSheet(name: string, regenerate = false) {
+    //TODO: シートが1件かつすでに存在する場合に対応する
+    const existSheet = this.spreadSheet.getSheetByName(name);
+    if (!existSheet) {
+      this.spreadSheet.insertSheet(name);
+    } else if (regenerate) {
+      this.spreadSheet.deleteSheet(existSheet);
+      this.spreadSheet.insertSheet(name);
+    }
+  }
 }

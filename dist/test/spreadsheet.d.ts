@@ -4,5 +4,6 @@ export declare const TestSpreadsheetHelper: {
     setTestdata: (spreadSheet: GoogleAppsScript.Spreadsheet.Spreadsheet, sheetName: string, values: SheetValues) => void;
     deleteSpreadSheet: (testSpreadSheetId: string) => void;
     createSpreadSheet: (spreadSheetName: string, folderId: string) => string;
+    deleteSheet: (spreadSheet: GoogleAppsScript.Spreadsheet.Spreadsheet, sheetname: string) => void;
 };
 export {};

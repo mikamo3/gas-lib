@@ -66,8 +66,16 @@ const setTestdata = (
   prepareSheet(spreadSheet, sheetName);
   appendValues(spreadSheet, sheetName, values);
 };
+
+const deleteSheet = (spreadSheet: GoogleAppsScript.Spreadsheet.Spreadsheet, sheetname: string) => {
+  const sheet = spreadSheet.getSheetByName(sheetname);
+  if (sheet) {
+    spreadSheet.deleteSheet(sheet);
+  }
+};
 export const TestSpreadsheetHelper = {
   setTestdata,
   deleteSpreadSheet,
-  createSpreadSheet
+  createSpreadSheet,
+  deleteSheet
 };

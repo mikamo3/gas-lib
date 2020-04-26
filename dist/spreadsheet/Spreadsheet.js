@@ -70,6 +70,18 @@ var Spreadsheet = /** @class */ (function () {
             .getRange(row, column, numRows, numColumns)
             .setDataValidation(rule);
     };
+    Spreadsheet.prototype.insertSheet = function (name, regenerate) {
+        if (regenerate === void 0) { regenerate = false; }
+        //TODO: シートが1件かつすでに存在する場合に対応する
+        var existSheet = this.spreadSheet.getSheetByName(name);
+        if (!existSheet) {
+            this.spreadSheet.insertSheet(name);
+        }
+        else if (regenerate) {
+            this.spreadSheet.deleteSheet(existSheet);
+            this.spreadSheet.insertSheet(name);
+        }
+    };
     return Spreadsheet;
 }());
 exports.Spreadsheet = Spreadsheet;

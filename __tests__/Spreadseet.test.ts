@@ -16,11 +16,14 @@ const newDataValidation = jest.fn();
 const requireValueInList = jest.fn();
 const build = jest.fn();
 const setDataValidation = jest.fn();
-
+const insertSheet = jest.fn();
+const deleteSheet = jest.fn();
 const mockedSpreadSheet: Partial<
   { [s in keyof GoogleAppsScript.Spreadsheet.Spreadsheet]: unknown }
 > = {
-  getSheetByName
+  getSheetByName,
+  insertSheet,
+  deleteSheet
 };
 
 const mockedSheet: Partial<{ [s in keyof GoogleAppsScript.Spreadsheet.Sheet]: unknown }> = {
@@ -42,6 +45,10 @@ const getLastRowRVB = 0;
 let getLastRowRV: number;
 const buildRVB = [];
 let buildRV: unknown[];
+
+const getSheetByNameRVB = mockedSheet;
+let getSheetByNameRV: Partial<{ [s in keyof GoogleAppsScript.Spreadsheet.Sheet]: unknown }>;
+
 SpreadsheetApp.openById = openById;
 SpreadsheetApp.newDataValidation = newDataValidation;
 
@@ -49,10 +56,11 @@ beforeAll(() => {
   getLastRowRV = getLastRowRVB;
   getValuesRV = getValuesRVB;
   buildRV = buildRVB;
+  getSheetByNameRV = getSheetByNameRVB;
 });
 beforeEach(() => {
   openById.mockReturnValue(mockedSpreadSheet);
-  getSheetByName.mockReturnValue(mockedSheet);
+  getSheetByName.mockReturnValue(getSheetByNameRV);
   getDataRange.mockReturnValue(mockedRange);
   getRange.mockReturnValue(mockedRange);
   getValues.mockReturnValue(getValuesRV);
@@ -303,6 +311,49 @@ describe("Spreadsheet", () => {
     });
     it("setDataValidationが呼び出されること", () => {
       expect(setDataValidation).toBeCalledWith(["0", "0.5", "1"]);
+    });
+  });
+  describe("insertSheet", () => {
+    const sheetname = "sheet";
+    let regenerate: boolean;
+    beforeEach(() => {
+      const spreadSheet = Spreadsheet.openById("hogehoge");
+      spreadSheet.insertSheet(sheetname, regenerate);
+    });
+    describe("同じsheetが存在しない場合", () => {
+      beforeAll(() => {
+        getSheetByNameRV = undefined;
+      });
+      it("指定したsheetnameのシートが作成されること", () => {
+        expect(mockedSpreadSheet.insertSheet).toBeCalledWith(sheetname);
+      });
+    });
+    describe("すでに同じsheetが存在する場合", () => {
+      beforeAll(() => {
+        getSheetByNameRV = getSheetByNameRVB;
+      });
+      describe("regerenate=trueの場合", () => {
+        beforeAll(() => {
+          regenerate = true;
+        });
+        it("既存のシートが削除されること", () => {
+          expect(mockedSpreadSheet.deleteSheet).toBeCalledWith(mockedSheet);
+        });
+        it("指定したsheetnameのシートが作成されること", () => {
+          expect(mockedSpreadSheet.insertSheet).toBeCalledWith(sheetname);
+        });
+      });
+      describe("regenerate=falseの場合", () => {
+        beforeAll(() => {
+          regenerate = false;
+        });
+        it("既存のシートが削除されないこと", () => {
+          expect(mockedSpreadSheet.deleteSheet).not.toBeCalled();
+        });
+        it("指定したsheetnameのシートが作成されないこと", () => {
+          expect(mockedSpreadSheet.insertSheet).not.toBeCalled();
+        });
+      });
     });
   });
 });
