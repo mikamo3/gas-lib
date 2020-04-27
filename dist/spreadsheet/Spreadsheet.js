@@ -3,12 +3,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var errors_1 = require("./errors");
 var Spreadsheet = /** @class */ (function () {
     function Spreadsheet(spreadsheet) {
-        this.spreadSheet = spreadsheet;
+        this.spreadsheet = spreadsheet;
     }
+    Spreadsheet.prototype.getSpreadsheet = function () {
+        return this.spreadsheet;
+    };
     Spreadsheet.openById = function (id) {
         try {
-            var spreadsheet = SpreadsheetApp.openById(id);
-            return new Spreadsheet(spreadsheet);
+            if (!this.spreadsheetCache[id]) {
+                var spreadsheet = SpreadsheetApp.openById(id);
+                this.spreadsheetCache[id] = spreadsheet;
+            }
+            return new Spreadsheet(this.spreadsheetCache[id]);
         }
         catch (e) {
             throw new errors_1.SpreadsheetAppException(e);
@@ -17,7 +23,7 @@ var Spreadsheet = /** @class */ (function () {
     Spreadsheet.prototype.getAllValues = function (sheetname) {
         var sheet;
         try {
-            sheet = this.spreadSheet.getSheetByName(sheetname);
+            sheet = this.spreadsheet.getSheetByName(sheetname);
         }
         catch (e) {
             throw new errors_1.SpreadsheetException(e);
@@ -32,7 +38,7 @@ var Spreadsheet = /** @class */ (function () {
         if (after === void 0) { after = 0; }
         var sheet;
         try {
-            sheet = this.spreadSheet.getSheetByName(sheetname);
+            sheet = this.spreadsheet.getSheetByName(sheetname);
         }
         catch (e) {
             throw new errors_1.SpreadsheetException(e);
@@ -65,7 +71,7 @@ var Spreadsheet = /** @class */ (function () {
         if (numRows === void 0) { numRows = 1; }
         if (numColumns === void 0) { numColumns = 1; }
         var rule = SpreadsheetApp.newDataValidation().requireValueInList(values).build();
-        this.spreadSheet
+        this.spreadsheet
             .getSheetByName(sheetname)
             .getRange(row, column, numRows, numColumns)
             .setDataValidation(rule);
@@ -73,15 +79,16 @@ var Spreadsheet = /** @class */ (function () {
     Spreadsheet.prototype.insertSheet = function (name, regenerate) {
         if (regenerate === void 0) { regenerate = false; }
         //TODO: シートが1件かつすでに存在する場合に対応する
-        var existSheet = this.spreadSheet.getSheetByName(name);
+        var existSheet = this.spreadsheet.getSheetByName(name);
         if (!existSheet) {
-            this.spreadSheet.insertSheet(name);
+            this.spreadsheet.insertSheet(name);
         }
         else if (regenerate) {
-            this.spreadSheet.deleteSheet(existSheet);
-            this.spreadSheet.insertSheet(name);
+            this.spreadsheet.deleteSheet(existSheet);
+            this.spreadsheet.insertSheet(name);
         }
     };
+    Spreadsheet.spreadsheetCache = {};
     return Spreadsheet;
 }());
 exports.Spreadsheet = Spreadsheet;

@@ -8,7 +8,7 @@ import { testInsertSheet } from "./test/testInsertSheet";
 declare let global: any;
 const prepareSpreadsheet = () => {
   const testFolderId = "1FdYqQOenb_Rn9jN6HvvAo1OjbxXHRmj4";
-  const spreadSheetName = "Suppli_テスト";
+  const spreadsheetName = "Suppli_テスト";
   const testSpreadSheetId = PropertiesService.getScriptProperties().getProperty(
     "testSpreadSheetId"
   );
@@ -16,7 +16,7 @@ const prepareSpreadsheet = () => {
     TestSpreadsheetHelper.deleteSpreadSheet(testSpreadSheetId);
     PropertiesService.getScriptProperties().setProperty("testSpreadSheetId", "");
   }
-  const spreadsheetId = TestSpreadsheetHelper.createSpreadSheet(spreadSheetName, testFolderId);
+  const spreadsheetId = TestSpreadsheetHelper.createSpreadSheet(spreadsheetName, testFolderId);
   if (!spreadsheetId) {
     throw new Error("createFailed");
   }

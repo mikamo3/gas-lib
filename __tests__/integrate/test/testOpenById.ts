@@ -4,7 +4,7 @@ export const testOpenById = () => {
     "testSpreadSheetId"
   );
   if (!testSpreadSheetId) {
-    throw new Error("spreadSheet does not exist");
+    throw new Error("spreadsheet does not exist");
   }
   Test.run(
     "openById",

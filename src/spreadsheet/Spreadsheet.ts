@@ -1,14 +1,21 @@
 import { SpreadsheetAppException, SpreadsheetException } from "./errors";
 
 export class Spreadsheet {
-  private spreadSheet: GoogleAppsScript.Spreadsheet.Spreadsheet;
+  static spreadsheetCache: { [P: string]: GoogleAppsScript.Spreadsheet.Spreadsheet } = {};
+  private spreadsheet: GoogleAppsScript.Spreadsheet.Spreadsheet;
   private constructor(spreadsheet: GoogleAppsScript.Spreadsheet.Spreadsheet) {
-    this.spreadSheet = spreadsheet;
+    this.spreadsheet = spreadsheet;
+  }
+  getSpreadsheet() {
+    return this.spreadsheet;
   }
   static openById(id: string) {
     try {
-      const spreadsheet = SpreadsheetApp.openById(id);
-      return new Spreadsheet(spreadsheet);
+      if (!this.spreadsheetCache[id]) {
+        const spreadsheet = SpreadsheetApp.openById(id);
+        this.spreadsheetCache[id] = spreadsheet;
+      }
+      return new Spreadsheet(this.spreadsheetCache[id]);
     } catch (e) {
       throw new SpreadsheetAppException(e);
     }
@@ -16,7 +23,7 @@ export class Spreadsheet {
   getAllValues(sheetname: string) {
     let sheet: GoogleAppsScript.Spreadsheet.Sheet;
     try {
-      sheet = this.spreadSheet.getSheetByName(sheetname);
+      sheet = this.spreadsheet.getSheetByName(sheetname);
     } catch (e) {
       throw new SpreadsheetException(e);
     }
@@ -29,7 +36,7 @@ export class Spreadsheet {
   replace(sheetname: string, values: unknown[][], after = 0) {
     let sheet: GoogleAppsScript.Spreadsheet.Sheet;
     try {
-      sheet = this.spreadSheet.getSheetByName(sheetname);
+      sheet = this.spreadsheet.getSheetByName(sheetname);
     } catch (e) {
       throw new SpreadsheetException(e);
     }
@@ -65,19 +72,19 @@ export class Spreadsheet {
     numColumns = 1
   ) {
     const rule = SpreadsheetApp.newDataValidation().requireValueInList(values).build();
-    this.spreadSheet
+    this.spreadsheet
       .getSheetByName(sheetname)
       .getRange(row, column, numRows, numColumns)
       .setDataValidation(rule);
   }
   insertSheet(name: string, regenerate = false) {
     //TODO: シートが1件かつすでに存在する場合に対応する
-    const existSheet = this.spreadSheet.getSheetByName(name);
+    const existSheet = this.spreadsheet.getSheetByName(name);
     if (!existSheet) {
-      this.spreadSheet.insertSheet(name);
+      this.spreadsheet.insertSheet(name);
     } else if (regenerate) {
-      this.spreadSheet.deleteSheet(existSheet);
-      this.spreadSheet.insertSheet(name);
+      this.spreadsheet.deleteSheet(existSheet);
+      this.spreadsheet.insertSheet(name);
     }
   }
 }

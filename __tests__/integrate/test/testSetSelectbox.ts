@@ -5,19 +5,19 @@ export const testSetSelectbox = () => {
     "testSpreadSheetId"
   );
   if (!testSpreadSheetId) {
-    throw new Error("spreadSheet does not exist");
+    throw new Error("spreadsheet does not exist");
   }
   const spreadsheet = Spreadsheet.openById(testSpreadSheetId);
   Test.run(
     "チェックボックスを設定",
     () => {
-      const spreadsheet = SpreadsheetApp.openById(testSpreadSheetId);
-      TestSpreadsheetHelper.setTestdata(spreadsheet, "hogehoge", []);
+      TestSpreadsheetHelper.setTestdata(spreadsheet.getSpreadsheet(), "hogehoge", []);
     },
     () => {
       spreadsheet.setSelectbox("hogehoge", ["foo", "bar"], 1, 2, 3, 4);
       const expected = ["foo", "bar"];
-      const actual = SpreadsheetApp.openById(testSpreadSheetId)
+      const actual = spreadsheet
+        .getSpreadsheet()
         .getSheetByName("hogehoge")
         .getRange(1, 2, 3, 4)
         .getDataValidations();

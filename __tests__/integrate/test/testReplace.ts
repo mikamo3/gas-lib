@@ -5,14 +5,13 @@ export const testReplace = () => {
     "testSpreadSheetId"
   );
   if (!testSpreadSheetId) {
-    throw new Error("spreadSheet does not exist");
+    throw new Error("spreadsheet does not exist");
   }
   const spreadsheet = Spreadsheet.openById(testSpreadSheetId);
   Test.run(
     "データがない場合",
     () => {
-      const spreadsheet = SpreadsheetApp.openById(testSpreadSheetId);
-      TestSpreadsheetHelper.setTestdata(spreadsheet, "hogehoge", [["foo", "bar"]]);
+      TestSpreadsheetHelper.setTestdata(spreadsheet.getSpreadsheet(), "hogehoge", [["foo", "bar"]]);
     },
     () => {
       spreadsheet.replace("hogehoge", []);
@@ -26,8 +25,7 @@ export const testReplace = () => {
   Test.run(
     "シートにデータがある場合",
     () => {
-      const spreadsheet = SpreadsheetApp.openById(testSpreadSheetId);
-      TestSpreadsheetHelper.setTestdata(spreadsheet, "hogehoge", [["foo", "bar"]]);
+      TestSpreadsheetHelper.setTestdata(spreadsheet.getSpreadsheet(), "hogehoge", [["foo", "bar"]]);
     },
     () => {
       spreadsheet.replace("hogehoge", [["hoge"], ["hoge", "fuga"], ["piyo"]]);
@@ -45,12 +43,12 @@ export const testReplace = () => {
   Test.run(
     "開始位置が指定された場合",
     () => {
-      const spreadsheet = SpreadsheetApp.openById(testSpreadSheetId);
-      TestSpreadsheetHelper.setTestdata(spreadsheet, "hogehoge", [["foo", "bar"]]);
+      TestSpreadsheetHelper.setTestdata(spreadsheet.getSpreadsheet(), "hogehoge", [["foo", "bar"]]);
     },
     () => {
       spreadsheet.replace("hogehoge", [["hoge"], ["hoge", "fuga"], ["piyo"]], 1);
-      const actual = SpreadsheetApp.openById(testSpreadSheetId)
+      const actual = spreadsheet
+        .getSpreadsheet()
         .getSheetByName("hogehoge")
         .getDataRange()
         .getValues();

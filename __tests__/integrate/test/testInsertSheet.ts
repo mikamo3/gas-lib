@@ -5,13 +5,13 @@ export const testInsertSheet = () => {
     "testSpreadSheetId"
   );
   if (!testSpreadSheetId) {
-    throw new Error("spreadSheet does not exist");
+    throw new Error("spreadsheet does not exist");
   }
+  const spreadsheet = Spreadsheet.openById(testSpreadSheetId);
   Test.run(
     "同じ名前のシートが存在しない場合",
     () => {
-      const spreadsheet = SpreadsheetApp.openById(testSpreadSheetId);
-      TestSpreadsheetHelper.deleteSheet(spreadsheet, "hogehoge");
+      TestSpreadsheetHelper.deleteSheet(spreadsheet.getSpreadsheet(), "hogehoge");
     },
     () => {
       const spreadsheet = Spreadsheet.openById(testSpreadSheetId);
@@ -23,13 +23,12 @@ export const testInsertSheet = () => {
   Test.run(
     "同じ名前のシートが存在する場合でregenerate=trueの場合",
     () => {
-      const spreadsheet = SpreadsheetApp.openById(testSpreadSheetId);
-      TestSpreadsheetHelper.setTestdata(spreadsheet, "hogehoge", [["foo", "bar"]]);
+      TestSpreadsheetHelper.setTestdata(spreadsheet.getSpreadsheet(), "hogehoge", [["foo", "bar"]]);
     },
     () => {
-      const spreadsheet = Spreadsheet.openById(testSpreadSheetId);
       spreadsheet.insertSheet("hogehoge", true);
-      const actual = SpreadsheetApp.openById(testSpreadSheetId)
+      const actual = spreadsheet
+        .getSpreadsheet()
         .getSheetByName("hogehoge")
         .getDataRange()
         .getValues();
@@ -39,13 +38,12 @@ export const testInsertSheet = () => {
   Test.run(
     "同じ名前のシートが存在する場合でregenerate=falseの場合",
     () => {
-      const spreadsheet = SpreadsheetApp.openById(testSpreadSheetId);
-      TestSpreadsheetHelper.setTestdata(spreadsheet, "hogehoge", [["foo", "bar"]]);
+      TestSpreadsheetHelper.setTestdata(spreadsheet.getSpreadsheet(), "hogehoge", [["foo", "bar"]]);
     },
     () => {
-      const spreadsheet = Spreadsheet.openById(testSpreadSheetId);
       spreadsheet.insertSheet("hogehoge", false);
-      const actual = SpreadsheetApp.openById(testSpreadSheetId)
+      const actual = spreadsheet
+        .getSpreadsheet()
         .getSheetByName("hogehoge")
         .getDataRange()
         .getValues();

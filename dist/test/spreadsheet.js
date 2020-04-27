@@ -9,19 +9,19 @@ var deleteSpreadSheet = function (testSpreadSheetId) {
         Logger.log(e);
         Logger.log("skip remove exist test spreadsheet");
     }
-    Logger.log("delete spreadSheet for test. id:" + testSpreadSheetId);
+    Logger.log("delete spreadsheet for test. id:" + testSpreadSheetId);
 };
-var createSpreadSheet = function (spreadSheetName, folderId) {
+var createSpreadSheet = function (spreadsheetName, folderId) {
     var file = Drive.Files.insert({
-        title: spreadSheetName,
+        title: spreadsheetName,
         mimeType: "application/vnd.google-apps.spreadsheet",
         parents: [{ id: folderId }]
     });
-    Logger.log("create spreadSheet for test. id:" + file.id);
+    Logger.log("create spreadsheet for test. id:" + file.id);
     return file.id;
 };
-var setTestdata = function (spreadSheet, sheetName, values) {
-    var appendValues = function (spreadSheet, sheetName, values) {
+var setTestdata = function (spreadsheet, sheetName, values) {
+    var appendValues = function (spreadsheet, sheetName, values) {
         var getRowNum = function (arr) { return arr.length; };
         var getColumnNum = function (arr) {
             return arr.reduce(function (column, a) { return (column < a.length ? a.length : column); }, 0);
@@ -39,24 +39,24 @@ var setTestdata = function (spreadSheet, sheetName, values) {
                 return filled;
             });
         };
-        var sheet = spreadSheet.setActiveSheet(spreadSheet.getSheetByName(sheetName));
+        var sheet = spreadsheet.setActiveSheet(spreadsheet.getSheetByName(sheetName));
         // eslint-disable-next-line prefer-spread
         sheet.getRange.apply(sheet, getRange(values)).setValues(getFormatValues(values));
     };
-    var prepareSheet = function (spreadSheet, sheetName) {
-        var sheet = spreadSheet.getSheetByName(sheetName);
+    var prepareSheet = function (spreadsheet, sheetName) {
+        var sheet = spreadsheet.getSheetByName(sheetName);
         if (sheet) {
-            spreadSheet.deleteSheet(sheet);
+            spreadsheet.deleteSheet(sheet);
         }
-        spreadSheet.insertSheet(sheetName);
+        spreadsheet.insertSheet(sheetName);
     };
-    prepareSheet(spreadSheet, sheetName);
-    appendValues(spreadSheet, sheetName, values);
+    prepareSheet(spreadsheet, sheetName);
+    appendValues(spreadsheet, sheetName, values);
 };
-var deleteSheet = function (spreadSheet, sheetname) {
-    var sheet = spreadSheet.getSheetByName(sheetname);
+var deleteSheet = function (spreadsheet, sheetname) {
+    var sheet = spreadsheet.getSheetByName(sheetname);
     if (sheet) {
-        spreadSheet.deleteSheet(sheet);
+        spreadsheet.deleteSheet(sheet);
     }
 };
 exports.TestSpreadsheetHelper = {

@@ -8,26 +8,26 @@ const deleteSpreadSheet = (testSpreadSheetId: string) => {
     Logger.log(e);
     Logger.log("skip remove exist test spreadsheet");
   }
-  Logger.log(`delete spreadSheet for test. id:${testSpreadSheetId}`);
+  Logger.log(`delete spreadsheet for test. id:${testSpreadSheetId}`);
 };
 
-const createSpreadSheet = (spreadSheetName: string, folderId: string) => {
+const createSpreadSheet = (spreadsheetName: string, folderId: string) => {
   const file = Drive.Files.insert({
-    title: spreadSheetName,
+    title: spreadsheetName,
     mimeType: "application/vnd.google-apps.spreadsheet",
     parents: [{ id: folderId }]
   });
-  Logger.log(`create spreadSheet for test. id:${file.id}`);
+  Logger.log(`create spreadsheet for test. id:${file.id}`);
   return file.id;
 };
 
 const setTestdata = (
-  spreadSheet: GoogleAppsScript.Spreadsheet.Spreadsheet,
+  spreadsheet: GoogleAppsScript.Spreadsheet.Spreadsheet,
   sheetName: string,
   values: SheetValues
 ) => {
   const appendValues = (
-    spreadSheet: GoogleAppsScript.Spreadsheet.Spreadsheet,
+    spreadsheet: GoogleAppsScript.Spreadsheet.Spreadsheet,
     sheetName: string,
     values: SheetValues
   ) => {
@@ -49,28 +49,28 @@ const setTestdata = (
       });
     };
 
-    const sheet = spreadSheet.setActiveSheet(spreadSheet.getSheetByName(sheetName));
+    const sheet = spreadsheet.setActiveSheet(spreadsheet.getSheetByName(sheetName));
     // eslint-disable-next-line prefer-spread
     sheet.getRange.apply(sheet, getRange(values)).setValues(getFormatValues(values));
   };
   const prepareSheet = (
-    spreadSheet: GoogleAppsScript.Spreadsheet.Spreadsheet,
+    spreadsheet: GoogleAppsScript.Spreadsheet.Spreadsheet,
     sheetName: string
   ) => {
-    const sheet = spreadSheet.getSheetByName(sheetName);
+    const sheet = spreadsheet.getSheetByName(sheetName);
     if (sheet) {
-      spreadSheet.deleteSheet(sheet);
+      spreadsheet.deleteSheet(sheet);
     }
-    spreadSheet.insertSheet(sheetName);
+    spreadsheet.insertSheet(sheetName);
   };
-  prepareSheet(spreadSheet, sheetName);
-  appendValues(spreadSheet, sheetName, values);
+  prepareSheet(spreadsheet, sheetName);
+  appendValues(spreadsheet, sheetName, values);
 };
 
-const deleteSheet = (spreadSheet: GoogleAppsScript.Spreadsheet.Spreadsheet, sheetname: string) => {
-  const sheet = spreadSheet.getSheetByName(sheetname);
+const deleteSheet = (spreadsheet: GoogleAppsScript.Spreadsheet.Spreadsheet, sheetname: string) => {
+  const sheet = spreadsheet.getSheetByName(sheetname);
   if (sheet) {
-    spreadSheet.deleteSheet(sheet);
+    spreadsheet.deleteSheet(sheet);
   }
 };
 export const TestSpreadsheetHelper = {

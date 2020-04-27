@@ -5,14 +5,13 @@ export const testGetAllValues = () => {
     "testSpreadSheetId"
   );
   if (!testSpreadSheetId) {
-    throw new Error("spreadSheet does not exist");
+    throw new Error("spreadsheet does not exist");
   }
   const spreadsheet = Spreadsheet.openById(testSpreadSheetId);
   Test.run(
     "シートにデータがない場合",
     () => {
-      const spreadsheet = SpreadsheetApp.openById(testSpreadSheetId);
-      TestSpreadsheetHelper.setTestdata(spreadsheet, "hogehoge", []);
+      TestSpreadsheetHelper.setTestdata(spreadsheet.getSpreadsheet(), "hogehoge", []);
     },
     () => {
       const actual = spreadsheet.getAllValues("hogehoge");
@@ -22,8 +21,7 @@ export const testGetAllValues = () => {
   Test.run(
     "シートにデータがある場合",
     () => {
-      const spreadsheet = SpreadsheetApp.openById(testSpreadSheetId);
-      TestSpreadsheetHelper.setTestdata(spreadsheet, "hogehoge", [
+      TestSpreadsheetHelper.setTestdata(spreadsheet.getSpreadsheet(), "hogehoge", [
         ["foo"],
         ["bar", "baz"],
         ["hoge"]

@@ -68,6 +68,7 @@ beforeEach(() => {
   newDataValidation.mockReturnValue({ requireValueInList });
   requireValueInList.mockReturnValue({ build });
   build.mockReturnValue(buildRV);
+  Spreadsheet.spreadsheetCache = {};
 });
 
 afterEach(() => {
@@ -76,12 +77,12 @@ afterEach(() => {
 describe("Spreadsheet", () => {
   describe("openById", () => {
     const id = "hogehoge";
-    let spreadSheet: Spreadsheet;
+    let spreadsheet: Spreadsheet;
     afterEach(() => {
-      spreadSheet = undefined;
+      spreadsheet = undefined;
     });
     const runOpenById = () => {
-      spreadSheet = Spreadsheet.openById(id);
+      spreadsheet = Spreadsheet.openById(id);
     };
     describe("実行時", () => {
       beforeEach(() => {
@@ -106,7 +107,7 @@ describe("Spreadsheet", () => {
         runOpenById();
       });
       it("SpreadSheetのインスタンスが返却されること", () => {
-        expect(spreadSheet).toBeInstanceOf(Spreadsheet);
+        expect(spreadsheet).toBeInstanceOf(Spreadsheet);
       });
     });
   });
@@ -116,8 +117,8 @@ describe("Spreadsheet", () => {
       actual = undefined;
     });
     const runGetAllValues = () => {
-      const spreadSheet = Spreadsheet.openById("hogehoge");
-      actual = spreadSheet.getAllValues("sheet");
+      const spreadsheet = Spreadsheet.openById("hogehoge");
+      actual = spreadsheet.getAllValues("sheet");
     };
     describe("Spreadsheet.getSheetByNameが例外を出した場合", () => {
       beforeEach(() => {
@@ -170,8 +171,8 @@ describe("Spreadsheet", () => {
     let values: unknown[][];
     let after = 1;
     beforeEach(() => {
-      const spreadSheet = Spreadsheet.openById("hogehoge");
-      spreadSheet.replace("sheet", values, after);
+      const spreadsheet = Spreadsheet.openById("hogehoge");
+      spreadsheet.replace("sheet", values, after);
     });
     describe("undefinedが渡された場合", () => {
       beforeAll(() => {
@@ -291,8 +292,8 @@ describe("Spreadsheet", () => {
       buildRV = values;
     });
     beforeEach(() => {
-      const spreadSheet = Spreadsheet.openById("hogehoge");
-      spreadSheet.setSelectbox("hoge", values, row, column, numRows, numColumns);
+      const spreadsheet = Spreadsheet.openById("hogehoge");
+      spreadsheet.setSelectbox("hoge", values, row, column, numRows, numColumns);
     });
     it("newDataValidationが呼び出されること", () => {
       expect(SpreadsheetApp.newDataValidation).toBeCalled();
@@ -317,8 +318,8 @@ describe("Spreadsheet", () => {
     const sheetname = "sheet";
     let regenerate: boolean;
     beforeEach(() => {
-      const spreadSheet = Spreadsheet.openById("hogehoge");
-      spreadSheet.insertSheet(sheetname, regenerate);
+      const spreadsheet = Spreadsheet.openById("hogehoge");
+      spreadsheet.insertSheet(sheetname, regenerate);
     });
     describe("同じsheetが存在しない場合", () => {
       beforeAll(() => {
