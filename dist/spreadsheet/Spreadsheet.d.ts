@@ -11,4 +11,6 @@ export declare class Spreadsheet {
     replace(sheetname: string, values: unknown[][], after?: number): void;
     setSelectbox(sheetname: string, values: string[], row: number, column: number, numRows?: number, numColumns?: number): void;
     insertSheet(name: string, regenerate?: boolean): void;
+    add(sheetname: string, values: unknown[][]): void;
+    private formatValues;
 }

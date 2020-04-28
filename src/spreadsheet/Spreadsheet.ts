@@ -46,22 +46,15 @@ export class Spreadsheet {
     if (!values || values.length === 0) {
       return;
     }
-    const maxColumn = values.reduce<number>((maxColumn, current) => {
-      return maxColumn < current.length ? current.length : maxColumn;
-    }, 0);
-    const formattedValues = values.map(v => {
-      const filled = new Array(maxColumn);
-      for (let i = 0; i < filled.length; i++) {
-        filled[i] = i < v.length ? v[i] : "";
-      }
-      return filled;
-    });
+    const formattedValues = this.formatValues(values);
     if (after === 0) {
       sheet.insertRows(formattedValues.length);
     } else {
       sheet.insertRowsAfter(after, formattedValues.length);
     }
-    sheet.getRange(after + 1, 1, values.length, maxColumn).setValues(formattedValues);
+    sheet
+      .getRange(after + 1, 1, formattedValues.length, formattedValues[0].length)
+      .setValues(formattedValues);
   }
   setSelectbox(
     sheetname: string,
@@ -86,5 +79,38 @@ export class Spreadsheet {
       this.spreadsheet.deleteSheet(existSheet);
       this.spreadsheet.insertSheet(name);
     }
+  }
+  add(sheetname: string, values: unknown[][]) {
+    let sheet: GoogleAppsScript.Spreadsheet.Sheet;
+    try {
+      sheet = this.spreadsheet.getSheetByName(sheetname);
+    } catch (e) {
+      throw new SpreadsheetException(e);
+    }
+    if (values.length === 0) {
+      return;
+    }
+    const formattedValues = this.formatValues(values);
+    const lastRow = sheet.getLastRow();
+    if (lastRow === 0) {
+      sheet.insertRows(formattedValues.length);
+    } else {
+      sheet.insertRowsAfter(lastRow, formattedValues.length);
+    }
+    sheet
+      .getRange(lastRow + 1, 1, formattedValues.length, formattedValues[0].length)
+      .setValues(formattedValues);
+  }
+  private formatValues(values: unknown[][]) {
+    const maxColumn = values.reduce<number>((maxColumn, current) => {
+      return maxColumn < current.length ? current.length : maxColumn;
+    }, 0);
+    return values.map(v => {
+      const filled = new Array(maxColumn);
+      for (let i = 0; i < filled.length; i++) {
+        filled[i] = i < v.length ? v[i] : "";
+      }
+      return filled;
+    });
   }
 }

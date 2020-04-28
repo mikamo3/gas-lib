@@ -49,23 +49,16 @@ var Spreadsheet = /** @class */ (function () {
         if (!values || values.length === 0) {
             return;
         }
-        var maxColumn = values.reduce(function (maxColumn, current) {
-            return maxColumn < current.length ? current.length : maxColumn;
-        }, 0);
-        var formattedValues = values.map(function (v) {
-            var filled = new Array(maxColumn);
-            for (var i = 0; i < filled.length; i++) {
-                filled[i] = i < v.length ? v[i] : "";
-            }
-            return filled;
-        });
+        var formattedValues = this.formatValues(values);
         if (after === 0) {
             sheet.insertRows(formattedValues.length);
         }
         else {
             sheet.insertRowsAfter(after, formattedValues.length);
         }
-        sheet.getRange(after + 1, 1, values.length, maxColumn).setValues(formattedValues);
+        sheet
+            .getRange(after + 1, 1, formattedValues.length, formattedValues[0].length)
+            .setValues(formattedValues);
     };
     Spreadsheet.prototype.setSelectbox = function (sheetname, values, row, column, numRows, numColumns) {
         if (numRows === void 0) { numRows = 1; }
@@ -87,6 +80,41 @@ var Spreadsheet = /** @class */ (function () {
             this.spreadsheet.deleteSheet(existSheet);
             this.spreadsheet.insertSheet(name);
         }
+    };
+    Spreadsheet.prototype.add = function (sheetname, values) {
+        var sheet;
+        try {
+            sheet = this.spreadsheet.getSheetByName(sheetname);
+        }
+        catch (e) {
+            throw new errors_1.SpreadsheetException(e);
+        }
+        if (values.length === 0) {
+            return;
+        }
+        var formattedValues = this.formatValues(values);
+        var lastRow = sheet.getLastRow();
+        if (lastRow === 0) {
+            sheet.insertRows(formattedValues.length);
+        }
+        else {
+            sheet.insertRowsAfter(lastRow, formattedValues.length);
+        }
+        sheet
+            .getRange(lastRow + 1, 1, formattedValues.length, formattedValues[0].length)
+            .setValues(formattedValues);
+    };
+    Spreadsheet.prototype.formatValues = function (values) {
+        var maxColumn = values.reduce(function (maxColumn, current) {
+            return maxColumn < current.length ? current.length : maxColumn;
+        }, 0);
+        return values.map(function (v) {
+            var filled = new Array(maxColumn);
+            for (var i = 0; i < filled.length; i++) {
+                filled[i] = i < v.length ? v[i] : "";
+            }
+            return filled;
+        });
     };
     Spreadsheet.spreadsheetCache = {};
     return Spreadsheet;

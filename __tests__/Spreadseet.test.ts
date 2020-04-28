@@ -357,4 +357,77 @@ describe("Spreadsheet", () => {
       });
     });
   });
+  describe("add", () => {
+    const sheetname = "sheetname";
+    const valuesBase = [["foo"], ["bar", "baz"], ["hoge", "fuga", "piyo", "hogehoge"]];
+    const expectedValuesBase = [
+      ["foo", "", "", ""],
+      ["bar", "baz", "", ""],
+      ["hoge", "fuga", "piyo", "hogehoge"]
+    ];
+    let values: unknown[][];
+    beforeAll(() => {
+      getLastRowRV = 0;
+      values = [];
+    });
+    beforeEach(() => {
+      const spreadsheet = Spreadsheet.openById("hogehoge");
+      spreadsheet.add(sheetname, values);
+    });
+    it("指定したシートが選択されること", () => {
+      expect(mockedSpreadSheet.getSheetByName).toBeCalledWith(sheetname);
+    });
+    describe("シートにデータが存在しないとき", () => {
+      beforeAll(() => {
+        getLastRowRV = 0;
+      });
+      describe("valuesが空のとき", () => {
+        beforeAll(() => {
+          values = [];
+        });
+        it("データが追加されないこと", () => {
+          expect(mockedSheet.insertRows).not.toBeCalled();
+          expect(mockedSheet.insertRowsAfter).not.toBeCalled();
+          expect(mockedSheet.getRange).not.toBeCalled();
+          expect(mockedRange.setValues).not.toBeCalled();
+        });
+      });
+      describe("valuesに値が存在するとき", () => {
+        beforeAll(() => {
+          values = valuesBase;
+        });
+        it("1行目にデータが追加されること", () => {
+          expect(mockedSheet.insertRows).toBeCalledWith(3);
+          expect(mockedSheet.getRange).toBeCalledWith(1, 1, 3, 4);
+          expect(mockedRange.setValues).toBeCalledWith(expectedValuesBase);
+        });
+      });
+    });
+    describe("シートにデータが存在するとき", () => {
+      beforeAll(() => {
+        getLastRowRV = 3;
+      });
+      describe("valuesが空のとき", () => {
+        beforeAll(() => {
+          values = [];
+        });
+        it("データが追加されないこと", () => {
+          expect(mockedSheet.insertRows).not.toBeCalled();
+          expect(mockedSheet.insertRowsAfter).not.toBeCalled();
+          expect(mockedSheet.getRange).not.toBeCalled();
+          expect(mockedRange.setValues).not.toBeCalled();
+        });
+      });
+      describe("valuesに値が存在するとき", () => {
+        beforeAll(() => {
+          values = valuesBase;
+        });
+        it("末尾にデータが追加されること", () => {
+          expect(mockedSheet.insertRowsAfter).toBeCalledWith(3, 3);
+          expect(mockedSheet.getRange).toBeCalledWith(4, 1, 3, 4);
+          expect(mockedRange.setValues).toBeCalledWith(expectedValuesBase);
+        });
+      });
+    });
+  });
 });
