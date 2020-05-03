@@ -13,7 +13,7 @@ export declare class Log {
     private logRule;
     private modePriority;
     private mode;
-    constructor(logwriter: Logwriter, mode: Mode, modePriority: ModePriority, logRule: LogRule);
+    constructor(logwriter: Logwriter, mode?: "test" | "development" | "production", modePriority?: ModePriority, logRule?: LogRule);
     debug(data: unknown): void;
     info(data: unknown): void;
     warn(data: unknown): void;

@@ -1,6 +1,5 @@
 import { filter, isArray } from "underscore";
 
-type Write = (message: unknown) => void;
 export type ModePriority = {
   [P in "test" | "development" | "production"]: number;
 };
@@ -12,12 +11,31 @@ export type LogRule = {
   [P in "debug" | "info" | "warn" | "error" | "critical"]: Mode;
 };
 
+const defaultMode: Mode = "test";
+const defaultModePriority: ModePriority = {
+  test: 0,
+  development: 1,
+  production: 2
+};
+const defaultLogRule: LogRule = {
+  debug: "development",
+  info: "development",
+  warn: "production",
+  error: "production",
+  critical: "production"
+};
+
 export class Log {
   private logwriter: Logwriter;
   private logRule: LogRule;
   private modePriority: ModePriority;
   private mode: keyof ModePriority;
-  constructor(logwriter: Logwriter, mode: Mode, modePriority: ModePriority, logRule: LogRule) {
+  constructor(
+    logwriter: Logwriter,
+    mode = defaultMode,
+    modePriority = defaultModePriority,
+    logRule = defaultLogRule
+  ) {
     this.logwriter = logwriter;
     this.logRule = logRule;
     this.modePriority = modePriority;

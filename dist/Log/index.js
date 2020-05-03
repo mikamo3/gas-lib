@@ -1,8 +1,24 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var underscore_1 = require("underscore");
+var defaultMode = "test";
+var defaultModePriority = {
+    test: 0,
+    development: 1,
+    production: 2
+};
+var defaultLogRule = {
+    debug: "development",
+    info: "development",
+    warn: "production",
+    error: "production",
+    critical: "production"
+};
 var Log = /** @class */ (function () {
     function Log(logwriter, mode, modePriority, logRule) {
+        if (mode === void 0) { mode = defaultMode; }
+        if (modePriority === void 0) { modePriority = defaultModePriority; }
+        if (logRule === void 0) { logRule = defaultLogRule; }
         this.logwriter = logwriter;
         this.logRule = logRule;
         this.modePriority = modePriority;
