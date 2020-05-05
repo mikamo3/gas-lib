@@ -1,5 +1,5 @@
 import { SpreadsheetAppException, SpreadsheetException } from "./errors";
-
+import log from "../Log";
 export class Spreadsheet {
   static spreadsheetCache: { [P: string]: GoogleAppsScript.Spreadsheet.Spreadsheet } = {};
   private spreadsheet: GoogleAppsScript.Spreadsheet.Spreadsheet;
@@ -13,7 +13,10 @@ export class Spreadsheet {
     try {
       if (!this.spreadsheetCache[id]) {
         const spreadsheet = SpreadsheetApp.openById(id);
+        log.debug(`create Spreadsheet id:${id}`);
         this.spreadsheetCache[id] = spreadsheet;
+      } else {
+        log.debug(`cache exist id:${id}`);
       }
       return new Spreadsheet(this.spreadsheetCache[id]);
     } catch (e) {
@@ -27,31 +30,44 @@ export class Spreadsheet {
     } catch (e) {
       throw new SpreadsheetException(e);
     }
+    log.debug(`target sheet:${sheetname}`);
     const values = sheet.getDataRange().getValues();
     if (!values || (values.length === 1 && values[0].length === 1 && values[0][0] === "")) {
       return [];
     }
+    log.debug("value:");
+    log.debug(values);
     return values;
   }
   replace(sheetname: string, values: unknown[][], after = 0) {
     let sheet: GoogleAppsScript.Spreadsheet.Sheet;
+    log.debug("sheetname:");
+    log.debug(sheetname);
+    log.debug("values:");
+    log.debug(values);
     try {
       sheet = this.spreadsheet.getSheetByName(sheetname);
     } catch (e) {
       throw new SpreadsheetException(e);
     }
-    if (sheet.getLastRow() !== 0 && sheet.getLastRow() > after) {
-      sheet.deleteRows(after + 1, sheet.getLastRow() - after);
+    const lastRow = sheet.getLastRow();
+    log.debug(`lastRow:${lastRow}`);
+    if (lastRow !== 0 && lastRow > after) {
+      const from = after + 1;
+      const to = lastRow - after;
+      log.debug(`delete rows ${from},${to}`);
+      sheet.deleteRows(from, to);
     }
     if (!values || values.length === 0) {
       return;
     }
-    const formattedValues = this.formatValues(values);
     if (after === 0) {
-      sheet.insertRows(formattedValues.length);
+      sheet.insertRows(values.length);
     } else {
-      sheet.insertRowsAfter(after, formattedValues.length);
+      sheet.insertRowsAfter(after, values.length);
     }
+    const formattedValues = this.formatValues(values);
+    log.debug(`insert range:${after + 1},1,${formattedValues.length},${formattedValues[0].length}`);
     sheet
       .getRange(after + 1, 1, formattedValues.length, formattedValues[0].length)
       .setValues(formattedValues);
@@ -64,6 +80,9 @@ export class Spreadsheet {
     numRows = 1,
     numColumns = 1
   ) {
+    log.debug(
+      `sheetname: ${sheetname} values: [${values.toString()}] row: ${row} column: ${column} numRows: ${numRows} numColumns: ${numColumns}`
+    );
     const rule = SpreadsheetApp.newDataValidation().requireValueInList(values).build();
     this.spreadsheet
       .getSheetByName(sheetname)
@@ -81,6 +100,9 @@ export class Spreadsheet {
     }
   }
   add(sheetname: string, values: unknown[][]) {
+    log.debug(`sheetname: ${sheetname}`);
+    log.debug(`values:`);
+    log.debug(values);
     let sheet: GoogleAppsScript.Spreadsheet.Sheet;
     try {
       sheet = this.spreadsheet.getSheetByName(sheetname);
@@ -92,11 +114,15 @@ export class Spreadsheet {
     }
     const formattedValues = this.formatValues(values);
     const lastRow = sheet.getLastRow();
+    log.debug(`lastRow: ${lastRow}`);
     if (lastRow === 0) {
       sheet.insertRows(formattedValues.length);
     } else {
       sheet.insertRowsAfter(lastRow, formattedValues.length);
     }
+    log.debug(
+      `insert range:${lastRow + 1},1,${formattedValues.length},${formattedValues[0].length}`
+    );
     sheet
       .getRange(lastRow + 1, 1, formattedValues.length, formattedValues[0].length)
       .setValues(formattedValues);

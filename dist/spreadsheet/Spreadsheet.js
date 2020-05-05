@@ -1,6 +1,10 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 var errors_1 = require("./errors");
+var Log_1 = __importDefault(require("../Log"));
 var Spreadsheet = /** @class */ (function () {
     function Spreadsheet(spreadsheet) {
         this.spreadsheet = spreadsheet;
@@ -12,7 +16,11 @@ var Spreadsheet = /** @class */ (function () {
         try {
             if (!this.spreadsheetCache[id]) {
                 var spreadsheet = SpreadsheetApp.openById(id);
+                Log_1.default.debug("create Spreadsheet id:" + id);
                 this.spreadsheetCache[id] = spreadsheet;
+            }
+            else {
+                Log_1.default.debug("cache exist id:" + id);
             }
             return new Spreadsheet(this.spreadsheetCache[id]);
         }
@@ -28,34 +36,47 @@ var Spreadsheet = /** @class */ (function () {
         catch (e) {
             throw new errors_1.SpreadsheetException(e);
         }
+        Log_1.default.debug("target sheet:" + sheetname);
         var values = sheet.getDataRange().getValues();
         if (!values || (values.length === 1 && values[0].length === 1 && values[0][0] === "")) {
             return [];
         }
+        Log_1.default.debug("value:");
+        Log_1.default.debug(values);
         return values;
     };
     Spreadsheet.prototype.replace = function (sheetname, values, after) {
         if (after === void 0) { after = 0; }
         var sheet;
+        Log_1.default.debug("sheetname:");
+        Log_1.default.debug(sheetname);
+        Log_1.default.debug("values:");
+        Log_1.default.debug(values);
         try {
             sheet = this.spreadsheet.getSheetByName(sheetname);
         }
         catch (e) {
             throw new errors_1.SpreadsheetException(e);
         }
-        if (sheet.getLastRow() !== 0 && sheet.getLastRow() > after) {
-            sheet.deleteRows(after + 1, sheet.getLastRow() - after);
+        var lastRow = sheet.getLastRow();
+        Log_1.default.debug("lastRow:" + lastRow);
+        if (lastRow !== 0 && lastRow > after) {
+            var from = after + 1;
+            var to = lastRow - after;
+            Log_1.default.debug("delete rows " + from + "," + to);
+            sheet.deleteRows(from, to);
         }
         if (!values || values.length === 0) {
             return;
         }
-        var formattedValues = this.formatValues(values);
         if (after === 0) {
-            sheet.insertRows(formattedValues.length);
+            sheet.insertRows(values.length);
         }
         else {
-            sheet.insertRowsAfter(after, formattedValues.length);
+            sheet.insertRowsAfter(after, values.length);
         }
+        var formattedValues = this.formatValues(values);
+        Log_1.default.debug("insert range:" + (after + 1) + ",1," + formattedValues.length + "," + formattedValues[0].length);
         sheet
             .getRange(after + 1, 1, formattedValues.length, formattedValues[0].length)
             .setValues(formattedValues);
@@ -63,6 +84,7 @@ var Spreadsheet = /** @class */ (function () {
     Spreadsheet.prototype.setSelectbox = function (sheetname, values, row, column, numRows, numColumns) {
         if (numRows === void 0) { numRows = 1; }
         if (numColumns === void 0) { numColumns = 1; }
+        Log_1.default.debug("sheetname: " + sheetname + " values: [" + values.toString() + "] row: " + row + " column: " + column + " numRows: " + numRows + " numColumns: " + numColumns);
         var rule = SpreadsheetApp.newDataValidation().requireValueInList(values).build();
         this.spreadsheet
             .getSheetByName(sheetname)
@@ -82,6 +104,9 @@ var Spreadsheet = /** @class */ (function () {
         }
     };
     Spreadsheet.prototype.add = function (sheetname, values) {
+        Log_1.default.debug("sheetname: " + sheetname);
+        Log_1.default.debug("values:");
+        Log_1.default.debug(values);
         var sheet;
         try {
             sheet = this.spreadsheet.getSheetByName(sheetname);
@@ -94,12 +119,14 @@ var Spreadsheet = /** @class */ (function () {
         }
         var formattedValues = this.formatValues(values);
         var lastRow = sheet.getLastRow();
+        Log_1.default.debug("lastRow: " + lastRow);
         if (lastRow === 0) {
             sheet.insertRows(formattedValues.length);
         }
         else {
             sheet.insertRowsAfter(lastRow, formattedValues.length);
         }
+        Log_1.default.debug("insert range:" + (lastRow + 1) + ",1," + formattedValues.length + "," + formattedValues[0].length);
         sheet
             .getRange(lastRow + 1, 1, formattedValues.length, formattedValues[0].length)
             .setValues(formattedValues);

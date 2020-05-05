@@ -10,7 +10,9 @@ export type Logwriter = {
 export type LogRule = {
   [P in "debug" | "info" | "warn" | "error" | "critical"]: Mode;
 };
-
+const defaultLogWriter: Logwriter = {
+  log: (data: unknown) => console.log(data)
+};
 const defaultMode: Mode = "test";
 const defaultModePriority: ModePriority = {
   test: 0,
@@ -31,7 +33,7 @@ export class Log {
   private modePriority: ModePriority;
   private mode: keyof ModePriority;
   constructor(
-    logwriter: Logwriter,
+    logwriter = defaultLogWriter,
     mode = defaultMode,
     modePriority = defaultModePriority,
     logRule = defaultLogRule
@@ -40,6 +42,18 @@ export class Log {
     this.logRule = logRule;
     this.modePriority = modePriority;
     this.mode = mode;
+  }
+  setLogwriter(logwriter: Logwriter) {
+    this.logwriter = logwriter;
+  }
+  setMode(mode: Mode) {
+    this.mode = mode;
+  }
+  setModePriority(modePriority: ModePriority) {
+    this.modePriority = modePriority;
+  }
+  setLogRule(logRule: LogRule) {
+    this.logRule = logRule;
   }
   debug(data: unknown) {
     this.write("debug", data);
@@ -62,12 +76,8 @@ export class Log {
     return nowPriority <= targetPriority;
   }
   private write(mode: keyof LogRule, data: unknown) {
-    let output: string;
     if (this.writable(mode)) {
-      output = this.format(data) + "\n";
-      if (mode === "debug") {
-        output += "\n" + this.getTrace();
-      }
+      const output = this.format(data) + "\n";
       this.logwriter.log(output);
     }
   }
@@ -114,3 +124,45 @@ ${outputIndent("}", indent)}`;
     }
   }
 }
+
+export default (() => {
+  let logInstance: Log;
+  const getInstance = () => {
+    if (!logInstance) {
+      logInstance = new Log();
+    }
+    return logInstance;
+  };
+  return {
+    setConfig: (
+      logwriter = defaultLogWriter,
+      mode = defaultMode,
+      modePriority = defaultModePriority,
+      logRule = defaultLogRule
+    ) => {
+      if (!logInstance) {
+        logInstance = new Log(logwriter, mode, modePriority, logRule);
+        return;
+      }
+      logInstance.setLogwriter(logwriter);
+      logInstance.setMode(mode);
+      logInstance.setModePriority(modePriority);
+      logInstance.setLogRule(logRule);
+    },
+    debug: (data: unknown) => {
+      getInstance().debug(data);
+    },
+    info: (data: unknown) => {
+      getInstance().info(data);
+    },
+    warn: (data: unknown) => {
+      getInstance().warn(data);
+    },
+    error: (data: unknown) => {
+      getInstance().error(data);
+    },
+    critical: (data: unknown) => {
+      getInstance().critical(data);
+    }
+  };
+})();

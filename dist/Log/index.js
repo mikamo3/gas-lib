@@ -1,6 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var underscore_1 = require("underscore");
+var defaultLogWriter = {
+    log: function (data) { return console.log(data); }
+};
 var defaultMode = "test";
 var defaultModePriority = {
     test: 0,
@@ -16,6 +19,7 @@ var defaultLogRule = {
 };
 var Log = /** @class */ (function () {
     function Log(logwriter, mode, modePriority, logRule) {
+        if (logwriter === void 0) { logwriter = defaultLogWriter; }
         if (mode === void 0) { mode = defaultMode; }
         if (modePriority === void 0) { modePriority = defaultModePriority; }
         if (logRule === void 0) { logRule = defaultLogRule; }
@@ -24,6 +28,18 @@ var Log = /** @class */ (function () {
         this.modePriority = modePriority;
         this.mode = mode;
     }
+    Log.prototype.setLogwriter = function (logwriter) {
+        this.logwriter = logwriter;
+    };
+    Log.prototype.setMode = function (mode) {
+        this.mode = mode;
+    };
+    Log.prototype.setModePriority = function (modePriority) {
+        this.modePriority = modePriority;
+    };
+    Log.prototype.setLogRule = function (logRule) {
+        this.logRule = logRule;
+    };
     Log.prototype.debug = function (data) {
         this.write("debug", data);
     };
@@ -45,12 +61,8 @@ var Log = /** @class */ (function () {
         return nowPriority <= targetPriority;
     };
     Log.prototype.write = function (mode, data) {
-        var output;
         if (this.writable(mode)) {
-            output = this.format(data) + "\n";
-            if (mode === "debug") {
-                output += "\n" + this.getTrace();
-            }
+            var output = this.format(data) + "\n";
             this.logwriter.log(output);
         }
     };
@@ -103,4 +115,44 @@ var Log = /** @class */ (function () {
     return Log;
 }());
 exports.Log = Log;
+exports.default = (function () {
+    var logInstance;
+    var getInstance = function () {
+        if (!logInstance) {
+            logInstance = new Log();
+        }
+        return logInstance;
+    };
+    return {
+        setConfig: function (logwriter, mode, modePriority, logRule) {
+            if (logwriter === void 0) { logwriter = defaultLogWriter; }
+            if (mode === void 0) { mode = defaultMode; }
+            if (modePriority === void 0) { modePriority = defaultModePriority; }
+            if (logRule === void 0) { logRule = defaultLogRule; }
+            if (!logInstance) {
+                logInstance = new Log(logwriter, mode, modePriority, logRule);
+                return;
+            }
+            logInstance.setLogwriter(logwriter);
+            logInstance.setMode(mode);
+            logInstance.setModePriority(modePriority);
+            logInstance.setLogRule(logRule);
+        },
+        debug: function (data) {
+            getInstance().debug(data);
+        },
+        info: function (data) {
+            getInstance().info(data);
+        },
+        warn: function (data) {
+            getInstance().warn(data);
+        },
+        error: function (data) {
+            getInstance().error(data);
+        },
+        critical: function (data) {
+            getInstance().critical(data);
+        }
+    };
+})();
 //# sourceMappingURL=index.js.map

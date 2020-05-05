@@ -13,7 +13,11 @@ export declare class Log {
     private logRule;
     private modePriority;
     private mode;
-    constructor(logwriter: Logwriter, mode?: "test" | "development" | "production", modePriority?: ModePriority, logRule?: LogRule);
+    constructor(logwriter?: Logwriter, mode?: "test" | "development" | "production", modePriority?: ModePriority, logRule?: LogRule);
+    setLogwriter(logwriter: Logwriter): void;
+    setMode(mode: Mode): void;
+    setModePriority(modePriority: ModePriority): void;
+    setLogRule(logRule: LogRule): void;
     debug(data: unknown): void;
     info(data: unknown): void;
     warn(data: unknown): void;
@@ -24,3 +28,12 @@ export declare class Log {
     private getTrace;
     private format;
 }
+declare const _default: {
+    setConfig: (logwriter?: Logwriter, mode?: "test", modePriority?: ModePriority, logRule?: LogRule) => void;
+    debug: (data: unknown) => void;
+    info: (data: unknown) => void;
+    warn: (data: unknown) => void;
+    error: (data: unknown) => void;
+    critical: (data: unknown) => void;
+};
+export default _default;
