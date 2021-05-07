@@ -71,7 +71,7 @@
   },
   "dependencies": {
     "@types/underscore": "^1.9.4",
-    "underscore": "^1.10.2"
+    "underscore": "^1.12.1"
   },
   "husky": {
     "hooks": {
